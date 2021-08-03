@@ -10,7 +10,7 @@ export default function ListControls() {
   return (
     <ButtonGroup>
       <Button>Kafelki</Button>
-      <Button>Wgraj domyślne filmy</Button>
+      <Button onClick={() => appCtx.handleLoadDefaultVideos()}>Wgraj domyślne filmy</Button>
       <Button>Usuń wszystkie</Button>
       <Button>Tylko ulubione</Button>
 
