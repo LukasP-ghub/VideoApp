@@ -9,6 +9,7 @@ type AppCtx = {
     [prop: string]: string,
   },
   handleLoadDefaultVideos: () => void,
+  handleAddVideo: (ref: HTMLInputElement) => void,
 }
 
 const AppContext = React.createContext<AppCtx>({
@@ -20,10 +21,12 @@ const AppContext = React.createContext<AppCtx>({
     YOUTUBE: ``,
   },
   handleLoadDefaultVideos: () => { },
+  handleAddVideo: () => { },
 });
 
 
 export const AppContextProvider: React.FC = (props) => {
+  const [videos, setVideos] = useState<{}[]>([]);
 
   const fetchData = async (id: string) => {
     const response = await fetch(`${contextValue.API_ENDPOINTS.YOUTUBE}&id=${id}&key=${contextValue.API_KEYS.YOUTUBE}`);
@@ -46,7 +49,15 @@ export const AppContextProvider: React.FC = (props) => {
       return await fetchData(getVideoID(link))
     }));
     const parsedRes = await Promise.all(res.map((item) => item.json()));
-    console.log(parsedRes);
+    setVideos(parsedRes);
+  }
+
+  const handleAddVideo = async (ref: any) => {
+    const id = getVideoID(ref.current.value);
+    if (!id) return;
+    const res = await fetchData(id);
+    const parsedRes = await res.json();
+    setVideos(prev => [...prev, parsedRes]);
   }
 
   const contextValue: AppCtx = {
@@ -58,6 +69,7 @@ export const AppContextProvider: React.FC = (props) => {
       YOUTUBE: `https://www.googleapis.com/youtube/v3/videos?part=snippet%2Cstatistics`,
     },
     handleLoadDefaultVideos: handleLoadDefaultVideos,
+    handleAddVideo: handleAddVideo,
   }
 
   return <AppContext.Provider value={contextValue}>
