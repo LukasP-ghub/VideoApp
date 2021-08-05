@@ -2,22 +2,23 @@ import React from 'react'
 import Card from 'react-bootstrap/Card'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Button from 'react-bootstrap/Button'
+import { videoDataType } from '../assets/types/types'
 import VideoInfo from '../atoms/VideoInfo'
 
 interface videoCardType {
-  videoData: any
+  videoData: videoDataType
 }
 
 export default function VideoCard({ videoData }: videoCardType) {
   return (
     <Card className="flex-row align-items-center">
-      <Card.Img variant="top" src="holder.js/100px180" style={{ maxWidth: '350px' }} />
+      <Card.Img variant="top" src={videoData.VIDEO.thumbnail} style={{ maxWidth: '350px' }} />
       <Card.Body>
-        <Card.Title>Card Title</Card.Title>
+        <Card.Title>{videoData.VIDEO.title}</Card.Title>
         <div>
-          <div><VideoInfo content={`Odtworzenia: `} /><VideoInfo content={`0`} /></div>
-          <div><VideoInfo content={`Polubienia: `} /><VideoInfo content={`0`} /></div>
-          <div><VideoInfo content={`Data dodania: `} /><VideoInfo content={`0`} /></div>
+          <div><VideoInfo content={`Odtworzenia: `} /><VideoInfo content={videoData.VIDEO.viewCount} /></div>
+          <div><VideoInfo content={`Polubienia: `} /><VideoInfo content={videoData.VIDEO.likeCount} /></div>
+          <div><VideoInfo content={`Data dodania: `} /><VideoInfo content={videoData.VIDEO.publishDate} /></div>
         </div>
       </Card.Body>
       <ButtonGroup aria-label="Basic example" vertical>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { videoDataType } from '../types/types';
 
 type AppCtx = {
   defaultVideos: string[],
@@ -12,6 +13,7 @@ type AppCtx = {
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
 }
+
 
 const AppContext = React.createContext<AppCtx>({
   defaultVideos: [],
@@ -28,7 +30,7 @@ const AppContext = React.createContext<AppCtx>({
 
 
 export const AppContextProvider: React.FC = (props) => {
-  const [videos, setVideos] = useState<{}[]>([]);
+  const [videos, setVideos] = useState<videoDataType[]>([]);
 
   const fetchData = async (id: string) => {
     let response: any;
@@ -38,14 +40,27 @@ export const AppContextProvider: React.FC = (props) => {
         case 'YOUTUBE':
           response = await fetch(`${value.API_ENDPOINT}&id=${id}&key=${value.API_KEY}`);
           parsedRes = await response.json();
-          if (parsedRes.items.length !== 0) return { API: key, VIDEO: parsedRes }
+          if (parsedRes.items.length !== 0) return { API: key, VIDEO: normalizeVideoData({ API: key, DATA: parsedRes }) }
           break;
       }
     }
   }
 
-  const normalizeVideoData = (data: any) => {
-
+  const normalizeVideoData = ({ API, DATA }: { API: string, DATA: any }) => {
+    switch (API) {
+      case 'YOUTUBE':
+        const { id, snippet, statistics } = DATA.items[0];
+        return {
+          id: id,
+          title: snippet.localized.title,
+          description: snippet.localized.description,
+          publishDate: snippet.publishedAt,
+          thumbnail: snippet.thumbnails.default.url,
+          likeCount: statistics.likeCount,
+          viewCount: statistics.viewCount,
+        };
+        break;
+    }
   }
 
   const getVideoID = (input: string) => {
@@ -64,7 +79,7 @@ export const AppContextProvider: React.FC = (props) => {
     }));
     const parsedRes = await Promise.all(res.map((item) => item));
     console.log(parsedRes);
-    setVideos(prev => [...prev, parsedRes]);
+    setVideos(prev => [...prev, ...parsedRes]);
   }
 
   const handleAddVideo = async (ref: any) => {
