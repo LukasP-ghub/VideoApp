@@ -110,7 +110,7 @@ export const AppContextProvider: React.FC = (props) => {
 
   const handleInitVideoList = () => {
     const data = getDataFromLocalStorage();
-    setVideos([...data]);
+    if (data) setVideos([...data]);
   }
 
   const contextValue: AppCtx = {
