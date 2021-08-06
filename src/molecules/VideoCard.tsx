@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useRef, useContext } from 'react'
 import Card from 'react-bootstrap/Card'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Button from 'react-bootstrap/Button'
 import { videoDataType } from '../assets/types/types'
+import AppContext from '../assets/context/appContext';
 import VideoInfo from '../atoms/VideoInfo'
 
 interface videoCardType {
@@ -10,6 +11,7 @@ interface videoCardType {
 }
 
 export default function VideoCard({ videoData }: videoCardType) {
+  const appCtx = useContext(AppContext);
   return (
     <Card className="flex-row align-items-center">
       <Card.Img variant="top" src={videoData.VIDEO.thumbnail} style={{ maxWidth: '350px' }} />
@@ -23,7 +25,7 @@ export default function VideoCard({ videoData }: videoCardType) {
       </Card.Body>
       <ButtonGroup aria-label="Basic example" vertical>
         <Button variant="secondary">Obejrzyj</Button>
-        <Button variant="secondary">Usuń</Button>
+        <Button variant="secondary" onClick={() => appCtx.handleRemoveVideo(videoData.VIDEO.id)}>Usuń</Button>
         <Button variant="secondary">Dodaj do ulubionych</Button>
       </ButtonGroup>
     </Card>

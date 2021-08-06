@@ -12,6 +12,8 @@ type AppCtx = {
   videos: {}[],
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
+  handleRemoveVideo: (id: string) => void,
+  handleInitVideoList: () => void,
 }
 
 
@@ -26,6 +28,8 @@ const AppContext = React.createContext<AppCtx>({
   videos: [],
   handleLoadDefaultVideos: () => { },
   handleAddVideo: () => { },
+  handleRemoveVideo: () => { },
+  handleInitVideoList: () => { },
 });
 
 
@@ -63,6 +67,14 @@ export const AppContextProvider: React.FC = (props) => {
     }
   }
 
+  const addDataToLocalStorage = (data: any) => {
+    localStorage.setItem('videos', JSON.stringify(data));
+  }
+
+  const getDataFromLocalStorage = () => {
+    return JSON.parse(localStorage.getItem('videos'));
+  }
+
   const getVideoID = (input: string) => {
     let url;
     try {
@@ -78,7 +90,7 @@ export const AppContextProvider: React.FC = (props) => {
       return await fetchData(getVideoID(link))
     }));
     const parsedRes = await Promise.all(res.map((item) => item));
-    console.log(parsedRes);
+    addDataToLocalStorage([...videos, ...parsedRes]);
     setVideos(prev => [...prev, ...parsedRes]);
   }
 
@@ -86,7 +98,19 @@ export const AppContextProvider: React.FC = (props) => {
     const id = getVideoID(ref.current.value);
     if (!id) return;
     const res = await fetchData(id);
+    addDataToLocalStorage([...videos, res]);
     setVideos(prev => [...prev, res]);
+  }
+
+  const handleRemoveVideo = (id: string) => {
+    const newArr = videos.filter(item => item.VIDEO.id !== id);
+    addDataToLocalStorage([...newArr]);
+    setVideos([...newArr]);
+  }
+
+  const handleInitVideoList = () => {
+    const data = getDataFromLocalStorage();
+    setVideos([...data]);
   }
 
   const contextValue: AppCtx = {
@@ -100,6 +124,8 @@ export const AppContextProvider: React.FC = (props) => {
     videos: videos,
     handleLoadDefaultVideos: handleLoadDefaultVideos,
     handleAddVideo: handleAddVideo,
+    handleRemoveVideo: handleRemoveVideo,
+    handleInitVideoList: handleInitVideoList,
   }
 
   return <AppContext.Provider value={contextValue}>
