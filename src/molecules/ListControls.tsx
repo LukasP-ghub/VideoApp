@@ -11,12 +11,12 @@ export default function ListControls() {
     <ButtonGroup>
       <Button>Kafelki</Button>
       <Button onClick={() => appCtx.handleLoadDefaultVideos()}>Wgraj domyślne filmy</Button>
-      <Button>Usuń wszystkie</Button>
-      <Button>Tylko ulubione</Button>
+      <Button onClick={() => appCtx.handleClearList()}>Usuń wszystkie</Button>
+      <Button onClick={() => appCtx.handleSortList('favorite')}>Tylko ulubione</Button>
 
       <DropdownButton as={ButtonGroup} title="Sortuj" id="bg-nested-dropdown">
-        <Dropdown.Item eventKey="1">Ostatnio dodane</Dropdown.Item>
-        <Dropdown.Item eventKey="2">Najstarsze</Dropdown.Item>
+        <Dropdown.Item eventKey="1" onClick={() => appCtx.handleSortList('last-added')}>Ostatnio dodane</Dropdown.Item>
+        <Dropdown.Item eventKey="2" onClick={() => appCtx.handleSortList('oldest')}>Najstarsze</Dropdown.Item>
       </DropdownButton>
     </ButtonGroup>
   )

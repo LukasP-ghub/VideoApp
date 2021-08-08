@@ -14,6 +14,8 @@ type AppCtx = {
   handleAddVideo: (ref: HTMLInputElement) => void,
   handleRemoveVideo: (id: string) => void,
   handleInitVideoList: () => void,
+  handleClearList: () => void,
+  handleSortList: (action: string) => void,
 }
 
 
@@ -30,6 +32,8 @@ const AppContext = React.createContext<AppCtx>({
   handleAddVideo: () => { },
   handleRemoveVideo: () => { },
   handleInitVideoList: () => { },
+  handleClearList: () => { },
+  handleSortList: () => { },
 });
 
 
@@ -58,13 +62,18 @@ export const AppContextProvider: React.FC = (props) => {
           id: id,
           title: snippet.localized.title,
           description: snippet.localized.description,
-          publishDate: snippet.publishedAt,
+          publishDate: new Date(snippet.publishedAt).toLocaleDateString(),
           thumbnail: snippet.thumbnails.default.url,
           likeCount: statistics.likeCount,
           viewCount: statistics.viewCount,
         };
         break;
     }
+  }
+
+  const inverseDate = (date: string) => {
+    const dateArr = date.split('.').reverse().map(item => +item);
+    return new Date(dateArr[0], dateArr[1] - 1, dateArr[2]);
   }
 
   const addDataToLocalStorage = (data: any) => {
@@ -113,6 +122,28 @@ export const AppContextProvider: React.FC = (props) => {
     if (data) setVideos([...data]);
   }
 
+  const handleClearList = () => {
+    localStorage.removeItem('videos');
+    setVideos([]);
+  }
+
+  const handleSortList = (action: 'last-added' | 'oldest' | 'favorite') => {
+    let state = [...videos];
+    switch (action) {
+      case 'last-added':
+        state = state.sort((a, b) => {
+          return inverseDate(a.VIDEO.publishDate).getTime() - inverseDate(b.VIDEO.publishDate).getTime();
+        });
+        break;
+      case 'oldest':
+        state = state.sort((a, b) => {
+          return inverseDate(b.VIDEO.publishDate).getTime() - inverseDate(a.VIDEO.publishDate).getTime();
+        });
+        break;
+    }
+    setVideos([...state]);
+  }
+
   const contextValue: AppCtx = {
     defaultVideos: ['https://www.youtube.com/watch?v=qA6oyQQTJ3I', 'https://www.youtube.com/watch?v=ZYb_ZU8LNxs', 'https://www.youtube.com/watch?v=iWEgpdVSZyg', 'https://www.youtube.com/watch?v=IJ6EgdiI_wU'],
     API: {
@@ -126,6 +157,8 @@ export const AppContextProvider: React.FC = (props) => {
     handleAddVideo: handleAddVideo,
     handleRemoveVideo: handleRemoveVideo,
     handleInitVideoList: handleInitVideoList,
+    handleClearList: handleClearList,
+    handleSortList: handleSortList,
   }
 
   return <AppContext.Provider value={contextValue}>
