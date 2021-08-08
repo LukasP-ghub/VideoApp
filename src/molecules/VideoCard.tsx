@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from 'react'
+import React, { useContext } from 'react'
 import Card from 'react-bootstrap/Card'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Button from 'react-bootstrap/Button'
@@ -26,7 +26,7 @@ export default function VideoCard({ videoData }: videoCardType) {
       <ButtonGroup aria-label="Basic example" vertical>
         <Button variant="secondary">Obejrzyj</Button>
         <Button variant="secondary" onClick={() => appCtx.handleRemoveVideo(videoData.VIDEO.id)}>Usuń</Button>
-        <Button variant="secondary">Dodaj do ulubionych</Button>
+        <Button variant="secondary" onClick={() => appCtx.handleAddToFavorites(videoData.VIDEO.id)}>Dodaj do ulubionych</Button>
       </ButtonGroup>
     </Card>
   )

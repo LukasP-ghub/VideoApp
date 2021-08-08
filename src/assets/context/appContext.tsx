@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { videoDataType } from '../types/types';
+import { videoDataType, localStorageTagType } from '../types/types';
 
 type AppCtx = {
   defaultVideos: string[],
@@ -12,6 +12,7 @@ type AppCtx = {
   videos: {}[],
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
+  handleAddToFavorites: (id: string) => void,
   handleRemoveVideo: (id: string) => void,
   handleInitVideoList: () => void,
   handleClearList: () => void,
@@ -30,6 +31,7 @@ const AppContext = React.createContext<AppCtx>({
   videos: [],
   handleLoadDefaultVideos: () => { },
   handleAddVideo: () => { },
+  handleAddToFavorites: () => { },
   handleRemoveVideo: () => { },
   handleInitVideoList: () => { },
   handleClearList: () => { },
@@ -39,6 +41,8 @@ const AppContext = React.createContext<AppCtx>({
 
 export const AppContextProvider: React.FC = (props) => {
   const [videos, setVideos] = useState<videoDataType[]>([]);
+  const [favoriteVideos, setFavoriteVideos] = useState<videoDataType[]>([]);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   const fetchData = async (id: string) => {
     let response: any;
@@ -76,12 +80,12 @@ export const AppContextProvider: React.FC = (props) => {
     return new Date(dateArr[0], dateArr[1] - 1, dateArr[2]);
   }
 
-  const addDataToLocalStorage = (data: any) => {
-    localStorage.setItem('videos', JSON.stringify(data));
+  const addDataToLocalStorage = (data: any, tag: localStorageTagType) => {
+    localStorage.setItem(tag, JSON.stringify(data));
   }
 
-  const getDataFromLocalStorage = () => {
-    return JSON.parse(localStorage.getItem('videos'));
+  const getDataFromLocalStorage = (tag: localStorageTagType) => {
+    return JSON.parse(localStorage.getItem(tag)) || [];
   }
 
   const getVideoID = (input: string) => {
@@ -99,7 +103,7 @@ export const AppContextProvider: React.FC = (props) => {
       return await fetchData(getVideoID(link))
     }));
     const parsedRes = await Promise.all(res.map((item) => item));
-    addDataToLocalStorage([...videos, ...parsedRes]);
+    addDataToLocalStorage([...videos, ...parsedRes], 'videos');
     setVideos(prev => [...prev, ...parsedRes]);
   }
 
@@ -107,24 +111,39 @@ export const AppContextProvider: React.FC = (props) => {
     const id = getVideoID(ref.current.value);
     if (!id) return;
     const res = await fetchData(id);
-    addDataToLocalStorage([...videos, res]);
+    addDataToLocalStorage([...videos, res], 'videos');
     setVideos(prev => [...prev, res]);
+  }
+
+  const handleAddToFavorites = (id: string) => {
+    const video = videos.filter(item => item.VIDEO.id === id);
+    if (!favoriteVideos.filter(item => item.VIDEO.id === id).length) {
+      addDataToLocalStorage([...favoriteVideos, ...video], 'favorite');
+      setFavoriteVideos(prev => [...prev, ...video]);
+    } else {
+      alert('Video already is in favorites.');
+    }
+
   }
 
   const handleRemoveVideo = (id: string) => {
     const newArr = videos.filter(item => item.VIDEO.id !== id);
-    addDataToLocalStorage([...newArr]);
+    addDataToLocalStorage([...newArr], 'videos');
     setVideos([...newArr]);
   }
 
   const handleInitVideoList = () => {
-    const data = getDataFromLocalStorage();
-    if (data) setVideos([...data]);
+    const dataVideos = getDataFromLocalStorage('videos');
+    const dataFavorites = getDataFromLocalStorage('favorite');
+    setVideos([...dataVideos]);
+    setFavoriteVideos([...dataFavorites]);
   }
 
   const handleClearList = () => {
     localStorage.removeItem('videos');
+    localStorage.removeItem('favorite');
     setVideos([]);
+    setFavoriteVideos([]);
   }
 
   const handleSortList = (action: 'last-added' | 'oldest' | 'favorite') => {
@@ -139,6 +158,15 @@ export const AppContextProvider: React.FC = (props) => {
         state = state.sort((a, b) => {
           return inverseDate(b.VIDEO.publishDate).getTime() - inverseDate(a.VIDEO.publishDate).getTime();
         });
+        break;
+      case 'favorite':
+        if (isFavorite) {
+          state = getDataFromLocalStorage('videos');
+          setIsFavorite(prev => !prev);
+        } else {
+          state = [...favoriteVideos];
+          setIsFavorite(prev => !prev);
+        }
         break;
     }
     setVideos([...state]);
@@ -155,6 +183,7 @@ export const AppContextProvider: React.FC = (props) => {
     videos: videos,
     handleLoadDefaultVideos: handleLoadDefaultVideos,
     handleAddVideo: handleAddVideo,
+    handleAddToFavorites: handleAddToFavorites,
     handleRemoveVideo: handleRemoveVideo,
     handleInitVideoList: handleInitVideoList,
     handleClearList: handleClearList,
