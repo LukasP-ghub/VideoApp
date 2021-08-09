@@ -7,9 +7,9 @@ import ListPagination from '../molecules/ListPagination';
 export default function VideoList({ list }: { list: JSX.Element[] }) {
   const appCtx = useContext(AppContext);
   return (
-    <Container>
+    <Container fluid>
       <Row><ListControls /></Row>
-      <Row>{list.length > 0 && list}</Row>
+      <Row className='justify-content-evenly'>{list.length > 0 && list}</Row>
       <Row ><ListPagination /></Row>
     </Container>
   )

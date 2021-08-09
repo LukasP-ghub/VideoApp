@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { videoDataType, localStorageTagType } from '../types/types';
+import { videoDataType, localStorageTagType, listDisplayType } from '../types/types';
 
 type AppCtx = {
   defaultVideos: string[],
@@ -10,6 +10,7 @@ type AppCtx = {
     },
   },
   videos: {}[],
+  listDisplay: listDisplayType,
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
   handleAddToFavorites: (id: string) => void,
@@ -17,6 +18,7 @@ type AppCtx = {
   handleInitVideoList: () => void,
   handleClearList: () => void,
   handleSortList: (action: string) => void,
+  handleListDisplay: () => void,
 }
 
 
@@ -29,6 +31,7 @@ const AppContext = React.createContext<AppCtx>({
     },
   },
   videos: [],
+  listDisplay: 'list',
   handleLoadDefaultVideos: () => { },
   handleAddVideo: () => { },
   handleAddToFavorites: () => { },
@@ -36,6 +39,7 @@ const AppContext = React.createContext<AppCtx>({
   handleInitVideoList: () => { },
   handleClearList: () => { },
   handleSortList: () => { },
+  handleListDisplay: () => { },
 });
 
 
@@ -43,6 +47,7 @@ export const AppContextProvider: React.FC = (props) => {
   const [videos, setVideos] = useState<videoDataType[]>([]);
   const [favoriteVideos, setFavoriteVideos] = useState<videoDataType[]>([]);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [listDisplay, setListDisplay] = useState<listDisplayType>('tiles');
 
   const fetchData = async (id: string) => {
     let response: any;
@@ -172,6 +177,14 @@ export const AppContextProvider: React.FC = (props) => {
     setVideos([...state]);
   }
 
+  const handleListDisplay = () => {
+    if (listDisplay === 'tiles' && window.innerWidth > 570) {
+      setListDisplay('list');
+    } else {
+      setListDisplay('tiles');
+    }
+  }
+
   const contextValue: AppCtx = {
     defaultVideos: ['https://www.youtube.com/watch?v=qA6oyQQTJ3I', 'https://www.youtube.com/watch?v=ZYb_ZU8LNxs', 'https://www.youtube.com/watch?v=iWEgpdVSZyg', 'https://www.youtube.com/watch?v=IJ6EgdiI_wU'],
     API: {
@@ -181,6 +194,7 @@ export const AppContextProvider: React.FC = (props) => {
       },
     },
     videos: videos,
+    listDisplay: listDisplay,
     handleLoadDefaultVideos: handleLoadDefaultVideos,
     handleAddVideo: handleAddVideo,
     handleAddToFavorites: handleAddToFavorites,
@@ -188,6 +202,7 @@ export const AppContextProvider: React.FC = (props) => {
     handleInitVideoList: handleInitVideoList,
     handleClearList: handleClearList,
     handleSortList: handleSortList,
+    handleListDisplay: handleListDisplay,
   }
 
   return <AppContext.Provider value={contextValue}>

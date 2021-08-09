@@ -14,3 +14,4 @@ export type videoDataType = {
 }
 
 export type localStorageTagType = 'videos' | 'favorite';
+export type listDisplayType = 'list' | 'tiles';

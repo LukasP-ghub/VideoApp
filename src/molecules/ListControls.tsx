@@ -8,8 +8,8 @@ export default function ListControls() {
   const appCtx = useContext(AppContext);
 
   return (
-    <ButtonGroup>
-      <Button>Kafelki</Button>
+    <ButtonGroup className='flex-wrap justify-content-evenly'>
+      <Button onClick={() => appCtx.handleListDisplay()}>Kafelki</Button>
       <Button onClick={() => appCtx.handleLoadDefaultVideos()}>Wgraj domyślne filmy</Button>
       <Button onClick={() => appCtx.handleClearList()}>Usuń wszystkie</Button>
       <Button onClick={() => appCtx.handleSortList('favorite')}>Tylko ulubione</Button>
