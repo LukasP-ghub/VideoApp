@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { videoDataType, localStorageTagType, listDisplayType } from '../types/types';
+import { videoDataType, localStorageTagType, listDisplayType, paginationType, paginationHandlerType } from '../types/types';
 
 type AppCtx = {
   defaultVideos: string[],
@@ -11,6 +11,7 @@ type AppCtx = {
   },
   videos: {}[],
   listDisplay: listDisplayType,
+  pagination: paginationType,
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
   handleAddToFavorites: (id: string) => void,
@@ -19,6 +20,7 @@ type AppCtx = {
   handleClearList: () => void,
   handleSortList: (action: string) => void,
   handleListDisplay: () => void,
+  handlePagination: (pageTag: paginationHandlerType) => void,
 }
 
 
@@ -32,6 +34,7 @@ const AppContext = React.createContext<AppCtx>({
   },
   videos: [],
   listDisplay: 'list',
+  pagination: { page: 1, itemsPerPage: 6, totalPages: 1 },
   handleLoadDefaultVideos: () => { },
   handleAddVideo: () => { },
   handleAddToFavorites: () => { },
@@ -40,6 +43,7 @@ const AppContext = React.createContext<AppCtx>({
   handleClearList: () => { },
   handleSortList: () => { },
   handleListDisplay: () => { },
+  handlePagination: () => { },
 });
 
 
@@ -48,6 +52,7 @@ export const AppContextProvider: React.FC = (props) => {
   const [favoriteVideos, setFavoriteVideos] = useState<videoDataType[]>([]);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [listDisplay, setListDisplay] = useState<listDisplayType>('tiles');
+  const [pagination, setPagination] = useState<paginationType>({ page: 1, itemsPerPage: 6, totalPages: 1 });
 
   const fetchData = async (id: string) => {
     let response: any;
@@ -116,7 +121,8 @@ export const AppContextProvider: React.FC = (props) => {
     const id = getVideoID(ref.current.value);
     if (!id) return;
     const res = await fetchData(id);
-    addDataToLocalStorage([...videos, res], 'videos');
+    const actualList = getDataFromLocalStorage('videos');
+    addDataToLocalStorage([...actualList, res], 'videos');
     setVideos(prev => [...prev, res]);
   }
 
@@ -132,7 +138,8 @@ export const AppContextProvider: React.FC = (props) => {
   }
 
   const handleRemoveVideo = (id: string) => {
-    const newArr = videos.filter(item => item.VIDEO.id !== id);
+    const actualList = getDataFromLocalStorage('videos');
+    const newArr = actualList.filter((item: videoDataType) => item.VIDEO.id !== id);
     addDataToLocalStorage([...newArr], 'videos');
     setVideos([...newArr]);
   }
@@ -142,6 +149,8 @@ export const AppContextProvider: React.FC = (props) => {
     const dataFavorites = getDataFromLocalStorage('favorite');
     setVideos([...dataVideos]);
     setFavoriteVideos([...dataFavorites]);
+    // setPagination(prev=>({...prev, totalPages:}))
+    handlePagination(1);
   }
 
   const handleClearList = () => {
@@ -185,8 +194,34 @@ export const AppContextProvider: React.FC = (props) => {
     }
   }
 
+  const handlePagination = (pageTag: paginationHandlerType) => {
+    const data: videoDataType[] = isFavorite ? getDataFromLocalStorage('favorite') : getDataFromLocalStorage('videos');
+    let actualPage = pagination.page;
+    let totalPages = Math.ceil(data.length / pagination.itemsPerPage)
+    switch (pageTag) {
+      case 'next':
+        actualPage++;
+        break;
+      case 'prev':
+        actualPage--;
+        break;
+      case 'first':
+        actualPage = 1;
+        break;
+      case 'last':
+        actualPage = totalPages;
+        break;
+      default:
+        actualPage = pageTag;
+        break;
+    }
+    const partialData = data.slice(pagination.itemsPerPage * actualPage - pagination.itemsPerPage, pagination.itemsPerPage * actualPage)
+    setPagination(prev => ({ ...prev, page: actualPage, totalPages: totalPages }));
+    setVideos([...partialData]);
+  }
+
   const contextValue: AppCtx = {
-    defaultVideos: ['https://www.youtube.com/watch?v=qA6oyQQTJ3I', 'https://www.youtube.com/watch?v=ZYb_ZU8LNxs', 'https://www.youtube.com/watch?v=iWEgpdVSZyg', 'https://www.youtube.com/watch?v=IJ6EgdiI_wU'],
+    defaultVideos: ['https://www.youtube.com/watch?v=qA6oyQQTJ3I', 'https://www.youtube.com/watch?v=ZYb_ZU8LNxs', 'https://www.youtube.com/watch?v=iWEgpdVSZyg', 'https://www.youtube.com/watch?v=IJ6EgdiI_wU', 'https://www.youtube.com/watch?v=rzD-cPhq02E', 'https://www.youtube.com/watch?v=ddVm53j80vc&t=341s', 'https://www.youtube.com/watch?v=EJtmfkKulNA', 'https://www.youtube.com/watch?v=7bpQUVK9Gn4', 'https://www.youtube.com/watch?v=1r-F3FIONl8', 'https://www.youtube.com/watch?v=vP2MNhC_Igw', 'https://www.youtube.com/watch?v=KOZUdLIop48', 'https://www.youtube.com/watch?v=qQR0mfFGRmo', 'https://www.youtube.com/watch?v=zVfVLBjQuSA'],
     API: {
       YOUTUBE: {
         API_KEY: `${process.env.GOGGLE_API_KEY}`,
@@ -195,6 +230,7 @@ export const AppContextProvider: React.FC = (props) => {
     },
     videos: videos,
     listDisplay: listDisplay,
+    pagination: pagination,
     handleLoadDefaultVideos: handleLoadDefaultVideos,
     handleAddVideo: handleAddVideo,
     handleAddToFavorites: handleAddToFavorites,
@@ -203,6 +239,7 @@ export const AppContextProvider: React.FC = (props) => {
     handleClearList: handleClearList,
     handleSortList: handleSortList,
     handleListDisplay: handleListDisplay,
+    handlePagination: handlePagination,
   }
 
   return <AppContext.Provider value={contextValue}>

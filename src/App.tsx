@@ -9,7 +9,11 @@ import VideoCard from './molecules/VideoCard';
 
 export default function App() {
   const appCtx = useContext(AppContext);
-  const list = appCtx.videos.map((video: videoDataType) => <VideoCard key={video.VIDEO.id} videoData={video} display={appCtx.listDisplay} />);
+  const list = appCtx.videos.map((video: videoDataType, index) => {
+    if (index < 6) {
+      return <VideoCard key={video.VIDEO.id} videoData={video} display={appCtx.listDisplay} />
+    }
+  });
 
   useEffect(() => {
     appCtx.handleInitVideoList();

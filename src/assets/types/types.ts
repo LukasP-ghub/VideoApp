@@ -15,3 +15,5 @@ export type videoDataType = {
 
 export type localStorageTagType = 'videos' | 'favorite';
 export type listDisplayType = 'list' | 'tiles';
+export type paginationType = { page: number, itemsPerPage: number, totalPages: number };
+export type paginationHandlerType = number | 'next' | 'prev' | 'first' | 'last';

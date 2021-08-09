@@ -1,24 +1,25 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
+import AppContext from '../assets/context/appContext';
 
 export default function ListPagination() {
+  const { pagination: { page, totalPages }, handlePagination } = useContext(AppContext);
   return (
     <Pagination className='justify-content-center'>
-      <Pagination.First />
-      <Pagination.Prev />
-      <Pagination.Item>{1}</Pagination.Item>
-      <Pagination.Ellipsis />
+      <Pagination.First onClick={() => handlePagination('first')} />
+      <Pagination.Prev disabled={page === 1 ? true : false} onClick={() => handlePagination('prev')} />
+      {page > 3 ? <Pagination.Ellipsis /> : null}
 
-      <Pagination.Item>{10}</Pagination.Item>
-      <Pagination.Item>{11}</Pagination.Item>
-      <Pagination.Item active>{12}</Pagination.Item>
-      <Pagination.Item>{13}</Pagination.Item>
-      <Pagination.Item disabled>{14}</Pagination.Item>
+      {page > 2 ? <Pagination.Item onClick={() => handlePagination(page - 2)}>{page - 2}</Pagination.Item> : null}
+      {page > 1 ? <Pagination.Item onClick={() => handlePagination(page - 1)}>{page - 1}</Pagination.Item> : null}
+      <Pagination.Item active>{page}</Pagination.Item>
+      {totalPages - page > 1 ? <Pagination.Item onClick={() => handlePagination(page + 1)}>{page + 1}</Pagination.Item> : null}
+      {totalPages - page > 2 ? <Pagination.Item onClick={() => handlePagination(page + 2)}>{page + 2}</Pagination.Item> : null}
 
-      <Pagination.Ellipsis />
-      <Pagination.Item>{20}</Pagination.Item>
-      <Pagination.Next />
-      <Pagination.Last />
+      {totalPages - page > 2 ? <Pagination.Ellipsis /> : null}
+      {totalPages > 1 && page !== totalPages ? <Pagination.Item onClick={() => handlePagination(totalPages)}>{totalPages}</Pagination.Item> : null}
+      <Pagination.Next disabled={page === totalPages ? true : false} onClick={() => handlePagination('next')} />
+      <Pagination.Last onClick={() => handlePagination('last')} />
     </Pagination>
   )
 }
