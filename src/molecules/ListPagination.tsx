@@ -1,9 +1,14 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
 import AppContext from '../assets/context/appContext';
 
 export default function ListPagination() {
-  const { pagination: { page, totalPages }, handlePagination } = useContext(AppContext);
+  const { pagination: { page, totalPages }, isFavorite, handlePagination } = useContext(AppContext);
+
+  useEffect(() => {
+    handlePagination(1);
+  }, [isFavorite])
+
   return (
     <Pagination className='justify-content-center'>
       <Pagination.First onClick={() => handlePagination('first')} />

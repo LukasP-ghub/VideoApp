@@ -12,6 +12,7 @@ type AppCtx = {
   videos: {}[],
   listDisplay: listDisplayType,
   pagination: paginationType,
+  isFavorite: boolean,
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
   handleAddToFavorites: (id: string) => void,
@@ -35,6 +36,7 @@ const AppContext = React.createContext<AppCtx>({
   videos: [],
   listDisplay: 'list',
   pagination: { page: 1, itemsPerPage: 6, totalPages: 1 },
+  isFavorite: false,
   handleLoadDefaultVideos: () => { },
   handleAddVideo: () => { },
   handleAddToFavorites: () => { },
@@ -108,13 +110,20 @@ export const AppContextProvider: React.FC = (props) => {
     }
   }
 
+  const removeVideoDuplicates = (actualList: videoDataType[], videosToAdd: videoDataType[]) => {
+    const idArr = actualList.map((video) => video.VIDEO.id);
+    return videosToAdd.filter((item) => !idArr.includes(item.VIDEO.id));
+  }
+
   const handleLoadDefaultVideos = async () => {
     const res = await Promise.all(contextValue.defaultVideos.map(async (link) => {
       return await fetchData(getVideoID(link))
     }));
     const parsedRes = await Promise.all(res.map((item) => item));
-    addDataToLocalStorage([...videos, ...parsedRes], 'videos');
-    setVideos(prev => [...prev, ...parsedRes]);
+    const actualList = getDataFromLocalStorage('videos');
+    const missingVideos = removeVideoDuplicates(actualList, parsedRes);
+    addDataToLocalStorage([...actualList, ...missingVideos], 'videos');
+    handlePagination(1);
   }
 
   const handleAddVideo = async (ref: any) => {
@@ -122,8 +131,9 @@ export const AppContextProvider: React.FC = (props) => {
     if (!id) return;
     const res = await fetchData(id);
     const actualList = getDataFromLocalStorage('videos');
-    addDataToLocalStorage([...actualList, res], 'videos');
-    setVideos(prev => [...prev, res]);
+    const newVideos = removeVideoDuplicates(actualList, [res]);
+    addDataToLocalStorage([...actualList, ...newVideos], 'videos');
+    handlePagination(1);
   }
 
   const handleAddToFavorites = (id: string) => {
@@ -134,30 +144,26 @@ export const AppContextProvider: React.FC = (props) => {
     } else {
       alert('Video already is in favorites.');
     }
-
   }
 
   const handleRemoveVideo = (id: string) => {
     const actualList = getDataFromLocalStorage('videos');
     const newArr = actualList.filter((item: videoDataType) => item.VIDEO.id !== id);
     addDataToLocalStorage([...newArr], 'videos');
-    setVideos([...newArr]);
+    handlePagination(1);
   }
 
   const handleInitVideoList = () => {
-    const dataVideos = getDataFromLocalStorage('videos');
     const dataFavorites = getDataFromLocalStorage('favorite');
-    setVideos([...dataVideos]);
     setFavoriteVideos([...dataFavorites]);
-    // setPagination(prev=>({...prev, totalPages:}))
     handlePagination(1);
   }
 
   const handleClearList = () => {
     localStorage.removeItem('videos');
     localStorage.removeItem('favorite');
-    setVideos([]);
     setFavoriteVideos([]);
+    handlePagination(1);
   }
 
   const handleSortList = (action: 'last-added' | 'oldest' | 'favorite') => {
@@ -231,6 +237,7 @@ export const AppContextProvider: React.FC = (props) => {
     videos: videos,
     listDisplay: listDisplay,
     pagination: pagination,
+    isFavorite: isFavorite,
     handleLoadDefaultVideos: handleLoadDefaultVideos,
     handleAddVideo: handleAddVideo,
     handleAddToFavorites: handleAddToFavorites,
