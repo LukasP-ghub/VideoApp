@@ -26,7 +26,7 @@ export default function VideoCard({ videoData, display }: videoCardType) {
         </div>
       </Card.Body>
       <ButtonGroup aria-label="Basic example" vertical>
-        <Button variant="secondary">Obejrzyj</Button>
+        <Button variant="secondary" onClick={() => appCtx.handleShowModal(videoData.VIDEO.link)}>Obejrzyj</Button>
         <Button variant="secondary" onClick={() => appCtx.handleRemoveVideo(videoData.VIDEO.id)}>Usuń</Button>
         <Button variant="secondary" onClick={() => appCtx.handleAddToFavorites(videoData.VIDEO.id)}>Dodaj do ulubionych</Button>
       </ButtonGroup>

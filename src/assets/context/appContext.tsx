@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { videoDataType, localStorageTagType, listDisplayType, paginationType, paginationHandlerType } from '../types/types';
+import { videoDataType, localStorageTagType, listDisplayType, paginationType, paginationHandlerType, showModalType } from '../types/types';
 
 type AppCtx = {
   defaultVideos: string[],
@@ -13,6 +13,7 @@ type AppCtx = {
   listDisplay: listDisplayType,
   pagination: paginationType,
   isFavorite: boolean,
+  showModal: showModalType,
   handleLoadDefaultVideos: () => void,
   handleAddVideo: (ref: HTMLInputElement) => void,
   handleAddToFavorites: (id: string) => void,
@@ -21,6 +22,7 @@ type AppCtx = {
   handleClearList: () => void,
   handleSortList: (action: string) => void,
   handleListDisplay: () => void,
+  handleShowModal: (src: string) => void,
   handlePagination: (pageTag: paginationHandlerType) => void,
 }
 
@@ -37,6 +39,7 @@ const AppContext = React.createContext<AppCtx>({
   listDisplay: 'list',
   pagination: { page: 1, itemsPerPage: 6, totalPages: 1 },
   isFavorite: false,
+  showModal: { isShow: false, link: '' },
   handleLoadDefaultVideos: () => { },
   handleAddVideo: () => { },
   handleAddToFavorites: () => { },
@@ -45,6 +48,7 @@ const AppContext = React.createContext<AppCtx>({
   handleClearList: () => { },
   handleSortList: () => { },
   handleListDisplay: () => { },
+  handleShowModal: () => { },
   handlePagination: () => { },
 });
 
@@ -53,6 +57,7 @@ export const AppContextProvider: React.FC = (props) => {
   const [videos, setVideos] = useState<videoDataType[]>([]);
   const [favoriteVideos, setFavoriteVideos] = useState<videoDataType[]>([]);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<showModalType>({ isShow: false, link: '' });
   const [listDisplay, setListDisplay] = useState<listDisplayType>('tiles');
   const [pagination, setPagination] = useState<paginationType>({ page: 1, itemsPerPage: 6, totalPages: 1 });
 
@@ -82,8 +87,8 @@ export const AppContextProvider: React.FC = (props) => {
           thumbnail: snippet.thumbnails.default.url,
           likeCount: statistics.likeCount,
           viewCount: statistics.viewCount,
+          link: `https://www.youtube.com/embed/${id}`
         };
-        break;
     }
   }
 
@@ -199,6 +204,9 @@ export const AppContextProvider: React.FC = (props) => {
       setListDisplay('tiles');
     }
   }
+  const handleShowModal = (src: string) => {
+    setShowModal(prev => ({ isShow: !prev.isShow, link: src }));
+  }
 
   const handlePagination = (pageTag: paginationHandlerType) => {
     const data: videoDataType[] = isFavorite ? getDataFromLocalStorage('favorite') : getDataFromLocalStorage('videos');
@@ -238,6 +246,7 @@ export const AppContextProvider: React.FC = (props) => {
     listDisplay: listDisplay,
     pagination: pagination,
     isFavorite: isFavorite,
+    showModal: showModal,
     handleLoadDefaultVideos: handleLoadDefaultVideos,
     handleAddVideo: handleAddVideo,
     handleAddToFavorites: handleAddToFavorites,
@@ -246,6 +255,7 @@ export const AppContextProvider: React.FC = (props) => {
     handleClearList: handleClearList,
     handleSortList: handleSortList,
     handleListDisplay: handleListDisplay,
+    handleShowModal: handleShowModal,
     handlePagination: handlePagination,
   }
 

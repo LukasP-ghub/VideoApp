@@ -6,11 +6,17 @@ export type normalizeVideoDataType = {
   thumbnail: string,
   likeCount: string,
   viewCount: string,
+  link: string,
 }
 
 export type videoDataType = {
   API: string,
   VIDEO: normalizeVideoDataType,
+}
+
+export type showModalType = {
+  isShow: boolean,
+  link: string,
 }
 
 export type localStorageTagType = 'videos' | 'favorite';

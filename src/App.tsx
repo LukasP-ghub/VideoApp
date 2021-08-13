@@ -6,6 +6,7 @@ import Logo from './atoms/Logo';
 import InputVideo from './molecules/InputVideo';
 import VideoList from './organisms/VideoList';
 import VideoCard from './molecules/VideoCard';
+import ModalWindow from './organisms/ModalWindow';
 
 export default function App() {
   const appCtx = useContext(AppContext);
@@ -14,7 +15,7 @@ export default function App() {
       return <VideoCard key={video.VIDEO.id} videoData={video} display={appCtx.listDisplay} />
     }
   });
-
+  console.log(appCtx.showModal)
   useEffect(() => {
     appCtx.handleInitVideoList();
     window.addEventListener('resize', () => {
@@ -23,16 +24,19 @@ export default function App() {
   }, [])
 
   return (
-    <Container fluid>
-      <Row>
-        <Col><Logo /></Col>
-      </Row>
-      <Row>
-        <Col><InputVideo clickHandler={appCtx.handleAddVideo} /></Col>
-      </Row>
-      <Row>
-        <Col><VideoList list={list} /></Col>
-      </Row>
-    </Container>
+    <>
+      <Container fluid>
+        <Row>
+          <Col><Logo /></Col>
+        </Row>
+        <Row>
+          <Col><InputVideo clickHandler={appCtx.handleAddVideo} /></Col>
+        </Row>
+        <Row>
+          <Col><VideoList list={list} /></Col>
+        </Row>
+      </Container>
+      {appCtx.showModal.isShow ? <ModalWindow click={() => appCtx.handleShowModal('')} /> : null}
+    </>
   )
 }
