@@ -15,7 +15,7 @@ export default function App() {
       return <VideoCard key={video.VIDEO.id} videoData={video} display={appCtx.listDisplay} />
     }
   });
-  console.log(appCtx.showModal)
+
   useEffect(() => {
     appCtx.handleInitVideoList();
     window.addEventListener('resize', () => {

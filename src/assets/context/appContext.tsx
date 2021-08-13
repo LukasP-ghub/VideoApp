@@ -34,6 +34,10 @@ const AppContext = React.createContext<AppCtx>({
       API_KEY: '',
       API_ENDPOINT: '',
     },
+    VIMEO: {
+      API_KEY: '',
+      API_ENDPOINT: '',
+    }
   },
   videos: [],
   listDisplay: 'list',
@@ -67,15 +71,36 @@ export const AppContextProvider: React.FC = (props) => {
     for await (const [key, value] of Object.entries(contextValue.API)) {
       switch (key) {
         case 'YOUTUBE':
-          response = await fetch(`${value.API_ENDPOINT}&id=${id}&key=${value.API_KEY}`);
-          parsedRes = await response.json();
-          if (parsedRes.items.length !== 0) return { API: key, VIDEO: normalizeVideoData({ API: key, DATA: parsedRes }) }
+          try {
+            response = await fetch(`${value.API_ENDPOINT}&id=${id}&key=${value.API_KEY}`);
+            parsedRes = await response.json();
+            if (parsedRes.items.length !== 0) return { API: key, VIDEO: normalizeVideoData({ API: key, ID: id, DATA: parsedRes }) }
+          } catch (err) {
+            alert(err);
+          }
+          break;
+        case 'VIMEO':
+          try {
+            response = await fetch(`${value.API_ENDPOINT}${id}`, {
+              headers: {
+                'Authorization': `bearer ${process.env.VIMEO_TOKEN}`
+              }
+            });
+            parsedRes = await response.json();
+          } catch (err) {
+            alert(err);
+          };
+          if (parsedRes.error) {
+            alert(parsedRes.error);
+          } else {
+            return { API: key, VIDEO: normalizeVideoData({ API: key, ID: id, DATA: parsedRes }) };
+          };
           break;
       }
     }
   }
 
-  const normalizeVideoData = ({ API, DATA }: { API: string, DATA: any }) => {
+  const normalizeVideoData = ({ API, ID, DATA }: { API: string, ID: string, DATA: any }) => {
     switch (API) {
       case 'YOUTUBE':
         const { id, snippet, statistics } = DATA.items[0];
@@ -88,6 +113,18 @@ export const AppContextProvider: React.FC = (props) => {
           likeCount: statistics.likeCount,
           viewCount: statistics.viewCount,
           link: `https://www.youtube.com/embed/${id}`
+        };
+      case 'VIMEO':
+        const { release_time, description, name, metadata, pictures } = DATA;
+        return {
+          id: ID,
+          title: name,
+          description: description,
+          publishDate: new Date(release_time).toLocaleDateString(),
+          thumbnail: pictures.sizes[3].link,
+          likeCount: metadata.connections.likes.total,
+          viewCount: 0,
+          link: `https://player.vimeo.com/video/${ID}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=222602&amp;h=95b3d22837`
         };
     }
   }
@@ -135,6 +172,7 @@ export const AppContextProvider: React.FC = (props) => {
     const id = getVideoID(ref.current.value);
     if (!id) return;
     const res = await fetchData(id);
+    if (!res) return;
     const actualList = getDataFromLocalStorage('videos');
     const newVideos = removeVideoDuplicates(actualList, [res]);
     addDataToLocalStorage([...actualList, ...newVideos], 'videos');
@@ -241,6 +279,10 @@ export const AppContextProvider: React.FC = (props) => {
         API_KEY: `${process.env.GOGGLE_API_KEY}`,
         API_ENDPOINT: `https://www.googleapis.com/youtube/v3/videos?part=snippet%2Cstatistics`,
       },
+      VIMEO: {
+        API_KEY: '',
+        API_ENDPOINT: `https://api.vimeo.com/videos/`
+      }
     },
     videos: videos,
     listDisplay: listDisplay,
