@@ -83,7 +83,7 @@ export const AppContextProvider: React.FC = (props) => {
           try {
             response = await fetch(`${value.API_ENDPOINT}${id}`, {
               headers: {
-                'Authorization': `bearer ${process.env.VIMEO_TOKEN}`
+                'Authorization': `bearer ${process.env.REACT_APP_VIMEO_TOKEN}`
               }
             });
             parsedRes = await response.json();
@@ -276,7 +276,7 @@ export const AppContextProvider: React.FC = (props) => {
     defaultVideos: ['https://www.youtube.com/watch?v=qA6oyQQTJ3I', 'https://www.youtube.com/watch?v=ZYb_ZU8LNxs', 'https://www.youtube.com/watch?v=iWEgpdVSZyg', 'https://www.youtube.com/watch?v=IJ6EgdiI_wU', 'https://www.youtube.com/watch?v=rzD-cPhq02E', 'https://www.youtube.com/watch?v=ddVm53j80vc&t=341s', 'https://www.youtube.com/watch?v=EJtmfkKulNA', 'https://www.youtube.com/watch?v=7bpQUVK9Gn4', 'https://www.youtube.com/watch?v=1r-F3FIONl8', 'https://www.youtube.com/watch?v=vP2MNhC_Igw', 'https://www.youtube.com/watch?v=KOZUdLIop48', 'https://www.youtube.com/watch?v=qQR0mfFGRmo', 'https://www.youtube.com/watch?v=zVfVLBjQuSA'],
     API: {
       YOUTUBE: {
-        API_KEY: process.env.GOGGLE_API_KEY,
+        API_KEY: process.env.REACT_APP_GOGGLE_API_KEY,
         API_ENDPOINT: `https://www.googleapis.com/youtube/v3/videos?part=snippet%2Cstatistics`,
       },
       VIMEO: {
