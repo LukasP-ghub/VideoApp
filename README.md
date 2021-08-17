@@ -6,3 +6,11 @@ In app user can create list of YouTube or Vimeo videos. Video can be added by li
 - TypeScript
 - Bootstrap
 - Webpack (custom)
+
+## Run
+### `Live`
+https://cities-app-react.netlify.app/
+
+### `npm install`
+
+### `npm start`
