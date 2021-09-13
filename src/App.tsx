@@ -25,7 +25,7 @@ export default function App() {
 
   return (
     <>
-      <Container fluid>
+      <Container fluid='xl'>
         <Row>
           <Col><Logo /></Col>
         </Row>

@@ -15,7 +15,7 @@ export default function VideoCard({ videoData, display }: videoCardType) {
   const appCtx = useContext(AppContext);
   const styles = display === 'list' ? { flexDirection: 'flex-row', maxWidth: '100%' } : { flexDirection: 'flex-column', maxWidth: '350px' };
   return (
-    <Card className={`${styles.flexDirection} align-items-center`} style={{ maxWidth: `${styles.maxWidth}` }} >
+    <Card className={`${styles.flexDirection} align-items-center py-2 m-2 shadow`} style={{ maxWidth: `${styles.maxWidth}` }} >
       <Card.Img variant="top" src={videoData.VIDEO.thumbnail} style={{ maxWidth: '350px' }} />
       <Card.Body>
         <Card.Title>{videoData.VIDEO.title}</Card.Title>

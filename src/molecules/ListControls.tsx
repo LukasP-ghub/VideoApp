@@ -6,10 +6,10 @@ import AppContext from '../assets/context/appContext'
 
 export default function ListControls() {
   const appCtx = useContext(AppContext);
-
+  const listDisplayLabel = appCtx.listDisplay === 'tiles' ? 'Karty' : 'Lista';
   return (
     <ButtonGroup className='flex-wrap justify-content-evenly'>
-      <Button onClick={() => appCtx.handleListDisplay()}>Kafelki</Button>
+      <Button onClick={() => appCtx.handleListDisplay()}>{listDisplayLabel}</Button>
       <Button onClick={() => appCtx.handleLoadDefaultVideos()}>Wgraj domyślne filmy</Button>
       <Button onClick={() => appCtx.handleClearList()}>Usuń wszystkie</Button>
       <Button onClick={() => appCtx.handleSortList('favorite')}>Tylko ulubione</Button>

@@ -13,16 +13,7 @@ export default function ModalWindow({ click }: { click: () => void }) {
       centered
       fullscreen={true}
     >
-      <Modal.Header>
-        <Modal.Title id="contained-modal-title-vcenter">
-          { }
-        </Modal.Title>
-      </Modal.Header>
       <Modal.Body>
-        {/* <video
-          src={`${appCtx.showModal.link}`}
-          width="100%">
-        </video> */}
         <iframe width="100%" height="100%"
           src={`${appCtx.showModal.link}`}></iframe>
       </Modal.Body>
